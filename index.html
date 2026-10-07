@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBSTETRIC & NEONATAL EMERGENCY MATRIX PRO v4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #060b13;
+            color: #d1d5db;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .hud-card {
+            background: rgba(10, 20, 36, 0.75);
+            border: 1px solid rgba(236, 72, 153, 0.25);
+            backdrop-filter: blur(8px);
+        }
+
+        .node-btn {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .node-locked {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(51, 65, 85, 0.4);
+            color: #475569;
+            cursor: not-allowed;
+        }
+
+        .node-active {
+            background: rgba(236, 72, 153, 0.2);
+            border-color: #ec4899;
+            color: #f472b6;
+            box-shadow: 0 0 12px rgba(236, 72, 153, 0.4);
+        }
+
+        .node-cleared {
+            background: rgba(6, 182, 212, 0.2);
+            border-color: #06b6d4;
+            color: #67e8f9;
+        }
+
+        .node-failed {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #09101d;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ec4899;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-3 md:p-6 select-none">
+
+    <!-- TOP HEADER / METRICS HUD -->
+    <header class="hud-card p-4 rounded-xl mb-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-pink-500/10 border border-pink-500/40 rounded-lg text-pink-400">
+                <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="font-orbitron font-black text-xl md:text-2xl tracking-wider text-pink-400">
+                    MATERNITY & NURSERY TRIAGE MATRIX <span class="text-xs px-2 py-0.5 rounded bg-pink-500/20 border border-pink-500/40 text-pink-300">PRO v4.0</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-mono tracking-wide">Obstetric & Neonatal Emergency Triangulation & Protocol Framework</p>
+            </div>
+        </div>
+
+        <!-- PROGRESS METRICS -->
+        <div class="grid grid-cols-3 gap-3 w-full md:w-auto text-center font-mono">
+            <div class="bg-slate-900/80 border border-slate-800 p-2 rounded-lg min-w-[100px]">
+                <div class="text-[10px] text-slate-400">PROGRESS</div>
+                <div id="metric-progress" class="text-lg font-bold text-slate-200">0 / 50</div>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 p-2 rounded-lg min-w-[100px]">
+                <div class="text-[10px] text-slate-400">SCORE</div>
+                <div id="metric-score" class="text-lg font-bold text-pink-400">0</div>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 p-2 rounded-lg min-w-[100px]">
+                <div class="text-[10px] text-slate-400">INTEGRITY</div>
+                <div id="metric-integrity" class="text-lg font-bold text-cyan-400">100%</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN DISPLAY -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
+
+        <!-- LEFT PANEL: TACTICAL SECTOR NODES GRID -->
+        <section class="lg:col-span-5 hud-card p-4 rounded-xl flex flex-col">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+                <div class="font-orbitron text-sm font-semibold text-slate-200 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span>
+                    TACTICAL MATERNITY & NURSERY NODES
+                </div>
+                <div class="text-xs text-slate-400 font-mono">50 Clinical Cases</div>
+            </div>
+
+            <!-- STATUS LEGEND -->
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mb-3 px-1">
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-slate-800 border border-slate-700"></span> Locked</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-pink-500/30 border border-pink-500"></span> Active</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-cyan-500/30 border border-cyan-500"></span> Cleared</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-500/30 border border-rose-500"></span> Failed</span>
+            </div>
+
+            <!-- 50 SECTOR GRID -->
+            <div id="nodes-grid" class="grid grid-cols-5 sm:grid-cols-10 lg:grid-cols-5 gap-2 overflow-y-auto max-h-[580px] p-1">
+                <!-- Dynamically generated by JS -->
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: CLINICAL TELEMETRY & TRIANGULATION MATRIX -->
+        <section class="lg:col-span-7 flex flex-col gap-4">
+            
+            <!-- TELEMETRY / VITAL SIGNS HUD -->
+            <div class="hud-card p-5 rounded-xl border-pink-500/30">
+                <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+                    <div>
+                        <span id="node-code-display" class="text-xs font-mono text-pink-500 block">NODE #01</span>
+                        <span id="node-title-display" class="font-orbitron font-bold text-pink-400 text-lg">
+                            Postpartum Hemorrhage (Atony)
+                        </span>
+                    </div>
+                    <span id="node-status-badge" class="px-2 py-0.5 rounded text-xs font-mono bg-pink-500/20 text-pink-300 border border-pink-500/40">
+                        ACTIVE
+                    </span>
+                </div>
+
+                <!-- CLINICAL SCENARIO -->
+                <div class="mb-4">
+                    <div class="text-[11px] text-slate-400 mb-1 tracking-wide font-mono">CLINICAL PRESENTATION & VITAL SIGNS</div>
+                    <p id="clinical-presentation" class="text-sm text-slate-200 leading-relaxed bg-slate-900/60 p-3 rounded-lg border border-slate-800/80">
+                        Loading clinical presentation parameters...
+                    </p>
+                </div>
+
+                <!-- LIVE VITALS GRID -->
+                <div>
+                    <div class="text-[11px] text-slate-400 mb-2 tracking-wide font-mono">PATIENT VITALS TELEMETRY</div>
+                    <div id="vitals-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs">
+                        <!-- Dynamically generated vitals -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3-STAGE TRIANGULATION MATRIX FORM -->
+            <div class="hud-card p-5 rounded-xl flex-1 flex flex-col justify-between">
+                <div>
+                    <div class="font-orbitron text-sm font-semibold text-slate-200 mb-3 pb-2 border-b border-slate-800 flex items-center justify-between">
+                        <span>CONFIGURE INTERVENTION MATRIX SEQUENCE</span>
+                        <span class="text-xs text-pink-400 font-mono">3-Stage Triangulation</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- 1. Nursing Protocol -->
+                        <div>
+                            <label class="block text-xs font-mono text-slate-300 mb-1">
+                                1. Nursing Protocol <span class="text-rose-400">*</span>
+                            </label>
+                            <select id="protocol-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:border-pink-500 focus:outline-none">
+                                <option value="">-- Select Priority Care --</option>
+                            </select>
+                        </div>
+
+                        <!-- 2. Pharmacological Agent -->
+                        <div>
+                            <label class="block text-xs font-mono text-slate-300 mb-1">
+                                2. Pharmacological Agent <span class="text-rose-400">*</span>
+                            </label>
+                            <select id="pharma-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:border-pink-500 focus:outline-none">
+                                <option value="">-- Select Medication --</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. Dosage & Administration -->
+                        <div>
+                            <label class="block text-xs font-mono text-slate-300 mb-1">
+                                3. Dosage & Administration <span class="text-rose-400">*</span>
+                            </label>
+                            <select id="dosage-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:border-pink-500 focus:outline-none">
+                                <option value="">-- Select Regimen --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FEEDBACK & EXECUTION BUTTON -->
+                <div class="mt-5">
+                    <div id="feedback-message" class="hidden p-3 rounded-lg mb-3 text-xs font-mono"></div>
+                    <button id="btn-execute" onclick="executeSequence()" class="w-full py-3 bg-pink-500 hover:bg-pink-400 text-slate-950 font-orbitron font-bold text-sm rounded-lg transition-all shadow-lg shadow-pink-500/20 active:scale-[0.99]">
+                        EXECUTE PROTOCOL SEQUENCE
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- JS ENGINE -->
+    <script>
+        // SPECIFIC 50 MATERNITY & NURSERY CLINICAL CASE DEFINITIONS
+        const caseDatabase = [
+            { title: "Postpartum Hemorrhage (Atony)", BP: "82/46 mmHg", HR: "138 bpm", SpO2: "92%", Temp: "36.5 °C", presentation: "P3A0 15 minutes post-vaginal delivery with persistent heavy dark red bleeding, large clots, and a boggy uterus soft above the umbilicus.", protocol: "Bimanual Uterine Compression & Fundal Massage", drug: "Oxytocin (Pitocin)", dose: "10-40 units in 1000 mL NS IV Infusion" },
+            { title: "Eclampsia (Seizure)", BP: "185/115 mmHg", HR: "124 bpm", SpO2: "89%", Temp: "37.2 °C", presentation: "38-week primigravida experiencing a generalized tonic-clonic seizure following severe frontal headache and epigastric distress.", protocol: "Left Lateral Position & Airway Protection", drug: "Magnesium Sulfate", dose: "4-6g IV Loading Dose over 15-20 mins" },
+            { title: "Neonatal Resuscitation (Asphyxia)", BP: "42/22 mmHg", HR: "52 bpm", SpO2: "62%", Temp: "35.8 °C", presentation: "Term infant delivered with thick meconium staining, limp posture, cyanotic skin, and gasping respirations.", protocol: "Positive Pressure Ventilation (PPV) via Neopuff", drug: "Epinephrine (1:10,000)", dose: "0.01 - 0.03 mg/kg IV/IO" },
+            { title: "Local Anesthetic Toxicity (LAST)", BP: "78/40 mmHg", HR: "42 bpm", SpO2: "86%", Temp: "36.6 °C", presentation: "Parturient experiencing tinnitus, metallic taste, sudden seizure, and ventricular arrhythmia 2 mins post-epidural top-up with Bupivacaine.", protocol: "Stop Epidural Infusion & Manual Left Uterine Displacement", drug: "Lipid Emulsion (Intralipid 20%)", dose: "1.5 mL/kg IV Bolus over 2-3 mins" },
+            { title: "Shoulder Dystocia", BP: "122/78 mmHg", HR: "98 bpm", SpO2: "98%", Temp: "36.8 °C", presentation: "Fetal head delivers but retracts tightly against the perineum ('turtle sign'); gentle traction fails to deliver anterior shoulder.", protocol: "McRoberts Maneuver & Suprapubic Pressure", drug: "Infiltration Local Anesthetics (Episiotomy)", dose: "Lidocaine 1% 10 mL Local Infiltration" },
+            { title: "Umbilical Cord Prolapse", BP: "118/74 mmHg", HR: "105 bpm", SpO2: "97%", Temp: "36.7 °C", presentation: "Sudden rupture of membranes followed immediately by prolonged fetal bradycardia (70 bpm); overt cord palpated in vagina.", protocol: "Manual Elevation of Fetal Presenting Part & Knee-Chest Position", drug: "Terbutaline Sulfate", dose: "0.25 mg Subcutaneously" },
+            { title: "Placental Abruption (Abruptio)", BP: "88/50 mmHg", HR: "132 bpm", SpO2: "94%", Temp: "36.4 °C", presentation: "34-week gestation presenting with sudden dark vaginal bleeding, severe continuous abdominal pain, hypertonic rigid uterus, and fetal distress.", protocol: "Large-Bore IV Access x2 & Emergency C-Section Prep", drug: "Crystalloid Fluid & Packed Red Blood Cells", dose: "1000 mL 0.9% NS Rapid Infusion + Type O Ref" },
+            { title: "Placenta Previa (Active Bleeding)", BP: "90/54 mmHg", HR: "120 bpm", SpO2: "96%", Temp: "36.6 °C", presentation: "32-week gestation presenting with painless, bright red vaginal bleeding; no uterine contractions or abdominal tenderness.", protocol: "Avoid Vaginal Exam & Bed Rest in Left Lateral Position", drug: "Betamethasone", dose: "12 mg IM 2 doses 24 hours apart" },
+            { title: "Uterine Rupture", BP: "70/38 mmHg", HR: "145 bpm", SpO2: "90%", Temp: "36.2 °C", presentation: "TOLAC patient experiencing sudden tearing abdominal pain, loss of fetal station, cessation of uterine contractions, and maternal shock.", protocol: "Immediate Resuscitation & Emergency Laparotomy", drug: "General Anesthetics & Blood Products", dose: "Massive Transfusion Protocol Activation" },
+            { title: "Preterm Labor (Tocolysis)", BP: "112/68 mmHg", HR: "92 bpm", SpO2: "98%", Temp: "36.9 °C", presentation: "30-week gestation presenting with regular painful uterine contractions every 5 mins and cervical effacement of 80%.", protocol: "Tocolytic Therapy & Continuous Fetal Monitoring", drug: "Nifedipine (Procardia)", dose: "20 mg PO Loading, then 10-20 mg PO q6h" },
+            { title: "Postpartum Endometritis", BP: "105/65 mmHg", HR: "115 bpm", SpO2: "96%", Temp: "39.1 °C", presentation: "Day 3 post-C-section patient presenting with foul-smelling lochia, severe lower abdominal tenderness, uterine subinvolution, and chills.", protocol: "Pelvic Assessment & Parenteral Antibiotics", drug: "Clindamycin + Gentamicin", dose: "Clindamycin 900mg + Gentamicin 1.5mg/kg IV q8h" },
+            { title: "Peripartum Cardiomyopathy", BP: "92/58 mmHg", HR: "128 bpm", SpO2: "84%", Temp: "36.7 °C", presentation: "1 week postpartum presenting with severe orthopnea, bilateral crackles, paroxysmal nocturnal dyspnea, and ejection fraction 28%.", protocol: "High-Fowler Position & Non-Invasive Ventilation", drug: "Furosemide (Lasix)", dose: "40 mg IV Slow Push" },
+            { title: "Amniotic Fluid Embolism (AFE)", BP: "55/30 mmHg", HR: "150 bpm", SpO2: "72%", Temp: "35.9 °C", presentation: "Sudden respiratory distress, cyanosis, cardiovascular collapse, and profound DIC immediately following membrane rupture during labor.", protocol: "AOK Protocol (Atropine, Ondansetron, Ketorolac)", drug: "Atropine + Ondansetron + Ketorolac", dose: "Atropine 0.2mg + Ondansetron 8mg + Ketorolac 30mg IV" },
+            { title: "Hyperemesis Gravidarum", BP: "94/58 mmHg", HR: "110 bpm", SpO2: "98%", Temp: "37.1 °C", presentation: "10-week primigravida with intractable vomiting, weight loss > 8%, dry mucous membranes, ketonuria 4+, and electrolyte imbalance.", protocol: "IV Hydration & Electrolyte Replacement", drug: "Pyridoxine (Vit B6) + Doxylamine", dose: "10 mg / 10 mg PO TID" },
+            { title: "Chorioamnionitis", BP: "108/64 mmHg", HR: "122 bpm", SpO2: "95%", Temp: "39.4 °C", presentation: "36-week gestation with prolonged ROM (22 hrs), maternal fever, foul-smelling amniotic fluid, uterine tenderness, and fetal tachycardia (180 bpm).", protocol: "Prompt Delivery & Intrapartum Antibiotic Therapy", drug: "Ampicillin + Gentamicin", dose: "Ampicillin 2g IV q6h + Gentamicin 2mg/kg IV Loading" },
+            { title: "Inverted Uterus (Uterine Inversion)", BP: "68/35 mmHg", HR: "140 bpm", SpO2: "91%", Temp: "36.1 °C", presentation: "Mass protruding from vagina following third stage of labor with heavy bleeding; uterine fundus unpalpable in abdomen.", protocol: "Manual Replacement (Johnson Maneuver) Before Uterotonics", drug: "Halothane / Sevoflurane or Nitroglycerin", dose: "NTG 100 mcg IV Push for Uterine Relaxation" },
+            { title: "Severe Preeclampsia (Magnesium Toxicity)", BP: "135/85 mmHg", HR: "58 bpm", SpO2: "91%", Temp: "36.4 °C", presentation: "Patient on Magnesium Sulfate infusion develops loss of deep tendon reflexes (patellar reflex absent), RR 8/min, and somnolence.", protocol: "Stop Magnesium Infusion & Provide Airway Support", drug: "Calcium Gluconate 10%", dose: "10 mL (1g) IV over 5-10 mins" },
+            { title: "Neonatal Respiratory Distress Syndrome (RDS)", BP: "38/20 mmHg", HR: "165 bpm", SpO2: "74%", Temp: "36.0 °C", presentation: "28-week premature infant displaying grunting, intercostal retractions, nasal flaring, and 'ground-glass' appearance on chest X-ray.", protocol: "Endotracheal Intubation & Exogenous Surfactant", drug: "Beractant (Survanta)", dose: "4 mL/kg Intratracheal Instillation" },
+            { title: "Meconium Aspiration Syndrome (MAS)", BP: "44/24 mmHg", HR: "155 bpm", SpO2: "78%", Temp: "36.6 °C", presentation: "Term infant born through thick meconium displaying coarse crackles, barrel chest, severe tachypnea, and cyanosis.", protocol: "Warmth, Oxygenation & Minimal Handling (CPAP/Vent)", drug: "Ampicillin + Cefotaxime", dose: "Ampicillin 100mg/kg/day + Cefotaxime 100mg/kg/day" },
+            { title: "Neonatal Hypoglycemia", BP: "48/26 mmHg", HR: "140 bpm", SpO2: "96%", Temp: "36.1 °C", presentation: "Infant of diabetic mother presenting with jitteriness, high-pitched cry, lethargy, poor feeding, and POC blood glucose of 18 mg/dL.", protocol: "Immediate Enteral Feeding or IV Dextrose Bolus", drug: "Dextrose 10% (D10W)", dose: "2 mL/kg IV Bolus followed by 6-8 mg/kg/min infusion" },
+            { title: "Neonatal Sepsis", BP: "35/18 mmHg", HR: "185 bpm", SpO2: "85%", Temp: "35.2 °C", presentation: "12-hour-old newborn with hypothermia, poor skin perfusion, capillary refill 5s, apnea episodes, and abdominal distension.", protocol: "Blood Cultures, Lumbar Puncture & Fluid Resuscitation", drug: "Ampicillin + Gentamicin", dose: "Ampicillin 50 mg/kg IV + Gentamicin 4 mg/kg IV" },
+            { title: "Neonatal Opioid Withdrawal (NAS)", BP: "65/38 mmHg", HR: "172 bpm", SpO2: "97%", Temp: "37.8 °C", presentation: "48-hour-old infant with high-pitched continuous crying, tremors, hypertonia, sneezing, excoriated skin, and Finnegan score 12.", protocol: "Swaddling, Low-Stimulation Environment & Frequent Small Feeds", drug: "Morphine Sulfate (Oral Solution)", dose: "0.04 - 0.1 mg/kg PO every 3-4 hours" },
+            { title: "Neonatal Hyperbilirubinemia (Kernicterus Risk)", BP: "50/28 mmHg", HR: "135 bpm", SpO2: "98%", Temp: "36.8 °C", presentation: "3-day-old infant with jaundice extending to soles of feet, total serum bilirubin 24 mg/dL, lethargy, and poor latch.", protocol: "Intensive Phototherapy & Hydration", drug: "IV Immunoglobulin (IVIG) - if Isoimmune", dose: "0.5 - 1.0 g/kg IV Infusion over 2 hours" },
+            { title: "Congenital Diaphragmatic Hernia (CDH)", BP: "36/18 mmHg", HR: "170 bpm", SpO2: "68%", Temp: "36.2 °C", presentation: "Newborn with scaphoid abdomen, cyanosis, bowel sounds heard in left chest, and severe respiratory distress at birth.", protocol: "Immediate Endotracheal Intubation (Avoid Bag-Valve-Mask)", drug: "Inhaled Nitric Oxide (iNO)", dose: "20 ppm Continuous Inhalation" },
+            { title: "Neonatal Seizures", BP: "52/30 mmHg", HR: "160 bpm", SpO2: "90%", Temp: "36.7 °C", presentation: "6-hour-old infant demonstrating repetitive bicycling leg movements, lip-smacking, and focal tonic limb clonic jerking.", protocol: "Airway Maintenance & Metabolic Workup", drug: "Phenobarbital", dose: "20 mg/kg IV Loading Dose over 10-15 mins" },
+            { title: "Severe PPD / Postpartum Psychosis", BP: "120/75 mmHg", HR: "102 bpm", SpO2: "99%", Temp: "36.6 °C", presentation: "Day 10 postpartum mother experiencing visual hallucinations, severe insomnia, delusions that infant is possessed, and agitation.", protocol: "Ensure Infant Safety & Urgent Psychiatric Admission", drug: "Haloperidol / Olanzapine", dose: "Olanzapine 5-10 mg PO / IM" },
+            { title: "Gestational Trophoblastic Disease (Molar)", BP: "148/92 mmHg", HR: "112 bpm", SpO2: "97%", Temp: "37.0 °C", presentation: "12-week gestation presenting with dark prune-juice vaginal discharge, severe hyperemesis, size greater than dates, serum hCG > 100,000.", protocol: "Suction Curettage & Chest X-Ray", drug: "Oxytocin (Post-Evacuation)", dose: "20 units in 1000 mL RL Infusion" },
+            { title: "Severe Cervical Insufficiency", BP: "110/70 mmHg", HR: "78 bpm", SpO2: "98%", Temp: "36.7 °C", presentation: "18-week gestation presenting with painless cervical dilation (4 cm), membranes bulging into vagina without contractions.", protocol: "Trendelenburg Position & Emergency Cervical Cerclage", drug: "Indomethacin", dose: "50 mg PO / Rectal Loading" },
+            { title: "Necrotizing Enterocolitis (NEC)", BP: "36/20 mmHg", HR: "178 bpm", SpO2: "88%", Temp: "35.5 °C", presentation: "VLBW preterm infant with abdominal distension, bilious emesis, bloody stools, abdominal wall erythema, and pneumatosis intestinalis.", protocol: "NPO, Gastric Decompression & Surgical Consult", drug: "Ampicillin + Gentamicin + Metronidazole", dose: "Broad Spectrum Triple Antibiotic Coverage" },
+            { title: "Patent Ductus Arteriosus (PDA)", BP: "54/20 mmHg", HR: "168 bpm", SpO2: "91%", Temp: "36.6 °C", presentation: "Preterm infant with bounding peripheral pulses, wide pulse pressure, continuous machinery murmur, and worsening ventilator requirement.", protocol: "Fluid Restriction & Echocardiography", drug: "Indomethacin / Ibuprofen IV", dose: "Ibuprofen IV 10 mg/kg, then 5 mg/kg at 24h & 48h" },
+            { title: "Transient Tachypnea of Newborn (TTN)", BP: "50/30 mmHg", HR: "145 bpm", SpO2: "89%", Temp: "36.7 °C", presentation: "Term infant born via elective C-section without labor displaying tachypnea (RR 90/min), mild grunting, fluid in interlobar fissures on X-ray.", protocol: "Supplemental Oxygen via Nasal Cannula & Neutral Thermal Environment", drug: "Supportive Care / Oxygen", dose: "Low Flow O2 0.5 - 1 L/min" },
+            { title: "Persistent Pulmonary HTN of Newborn (PPHN)", BP: "38/20 mmHg", HR: "175 bpm", SpO2: "70%", Temp: "36.3 °C", presentation: "Term infant with severe hypoxemia out of proportion to X-ray, pre-and-post ductal SpO2 gradient > 10%, labile oxygenation.", protocol: "Sedation, Minimal Stimulation & Echocardiogram", drug: "Inhaled Nitric Oxide (iNO)", dose: "20 ppm Inhalation" },
+            { title: "Hypoxic Ischemic Encephalopathy (HIE)", BP: "42/24 mmHg", HR: "110 bpm", SpO2: "94%", Temp: "33.5 °C", presentation: "Term newborn following prolonged uterine rupture, Sarnat Stage II: lethargic, hypotonic, absent primitive reflexes, low APGARs.", protocol: "Therapeutic Hypothermia (Targeted Temperature Management)", drug: "Morphine (for Sedation during Cooling)", dose: "0.05 mg/kg IV q4-6h" },
+            { title: "Neonatal Pneumothorax", BP: "34/18 mmHg", HR: "180 bpm", SpO2: "72%", Temp: "36.4 °C", presentation: "Infant on mechanical ventilation experiences sudden desaturation, bradycardia, absent breath sounds on right side, shifted heart sounds.", protocol: "Transillumination & Emergency Needle Aspiration", drug: "100% Oxygen (Nitrogen Washout)", dose: "High Flow Oxygen therapy" },
+            { title: "Obstetric Septic Shock", BP: "72/38 mmHg", HR: "142 bpm", SpO2: "90%", Temp: "39.8 °C", presentation: "Post-abortal patient with high fever, foul vaginal discharge, severe hypotension refractory to 30 mL/kg fluid bolus, lactate 4.8.", protocol: "Blood Cultures & Broad-Spectrum Antibiotics within 1hr", drug: "Norepinephrine", dose: "0.02 - 0.2 mcg/kg/min IV Infusion" },
+            { title: "Retained Placenta", BP: "100/60 mmHg", HR: "110 bpm", SpO2: "96%", Temp: "37.0 °C", presentation: "Placenta undelivered 45 minutes post-fetal expulsion with moderate continuous vaginal bleeding; umbilical cord intact.", protocol: "Manual Removal of Placenta under Anesthesia", drug: "Nitroglycerin IV / Sublingual", dose: "100 mcg IV to relax cervix if trapped" },
+            { title: "Vasa Previa Rupture", BP: "60/32 mmHg", HR: "190 bpm", SpO2: "85%", Temp: "36.5 °C", presentation: "Sudden painless vaginal bleeding coinciding with artificial rupture of membranes, followed immediately by severe fetal bradycardia.", protocol: "Immediate Emergency C-Section Delivery", drug: "Isotonic Saline / O-Negative Blood (Fetal/Maternal)", dose: "10-20 mL/kg Neonatal Resuscitation Pack" },
+            { title: "Acute Fatty Liver of Pregnancy (AFLP)", BP: "110/72 mmHg", HR: "105 bpm", SpO2: "95%", Temp: "37.2 °C", presentation: "36-week primigravida with jaundice, severe nausea, hypoglycemia (42 mg/dL), elevated transaminases, and prolonged PT/INR.", protocol: "Immediate Delivery Regardless of Gestational Age", drug: "Dextrose 10% Infusion & FFP", dose: "D10W at 100 mL/hr + Fresh Frozen Plasma" },
+            { title: "HELLP Syndrome", BP: "168/108 mmHg", HR: "100 bpm", SpO2: "96%", Temp: "36.9 °C", presentation: "33-week gestation presenting with severe right upper quadrant pain, platelets 48,000, AST 350 U/L, schistocytes on blood smear.", protocol: "Seizure Prophylaxis & Prepare for Delivery", drug: "Magnesium Sulfate + Dexamethasone", dose: "MgSO4 4g IV + Dexamethasone 10mg IV q12h" },
+            { title: "Post-Epidural Dural Puncture Headache", BP: "118/74 mmHg", HR: "82 bpm", SpO2: "98%", Temp: "36.8 °C", presentation: "Day 2 post-delivery patient reports excruciating frontal-occipital headache that worsens when sitting/standing and disappears lying flat.", protocol: "Conservative Hydration, Caffeine & Epidural Blood Patch", drug: "Caffeine Sodium Benzoate / IV Acetaminophen", dose: "500 mg Caffeine IV in 1000 mL NS" },
+            { title: "Pediatric / Neonatal Hypocalcemia", BP: "46/26 mmHg", HR: "150 bpm", SpO2: "95%", Temp: "36.5 °C", presentation: "Infant of diabetic mother at 48 hours displays jitteriness, Chvostek sign, prolonged QTc interval on ECG, ionization Ca 0.8 mmol/L.", protocol: "Continuous Cardiac Monitoring & Slow IV Infusion", drug: "Calcium Gluconate 10%", dose: "1-2 mL/kg IV over 10-20 mins" },
+            { title: "Third-Degree Perineal Laceration", BP: "112/70 mmHg", HR: "88 bpm", SpO2: "99%", Temp: "36.7 °C", presentation: "Post-vaginal delivery inspection reveals laceration extending through vaginal mucosa, perineal body, and involving external anal sphincter.", protocol: "Surgical Repair in OR with Adequate Lighting & Anesthesia", drug: "Cefazolin (Prophylactic Antibiotic)", dose: "1g IV Single Dose" },
+            { title: "Neonatal Omphalocele / Gastroschisis", BP: "42/22 mmHg", HR: "155 bpm", SpO2: "94%", Temp: "35.8 °C", presentation: "Newborn delivered with eviscerated bowel loops exposed to air without protective sac (Gastroschisis).", protocol: "Cover Bowel with Sterile Saline Gauze & Plastic Bowel Bag", drug: "IV Fluids (NS/D5W) & Broad-Spectrum Antibiotics", dose: "1.5x Maintenance Fluid Rate" },
+            { title: "Neonatal Congenital Syphilis", BP: "50/30 mmHg", HR: "140 bpm", SpO2: "97%", Temp: "37.5 °C", presentation: "Newborn presenting with maculopapular rash on palms/soles, 'snuffles' (bloody nasal discharge), hepatosplenomegaly, and osteochondritis.", protocol: "Isolation & Full Diagnostic Evaluation (CSF RPR)", drug: "Aqueous Crystalline Penicillin G", dose: "50,000 units/kg IV q12h for 10-14 days" },
+            { title: "Maternal Cardiac Arrest (PMCD Protocol)", BP: "0/0 mmHg", HR: "0 bpm", SpO2: "0%", Temp: "36.0 °C", presentation: "Maternal collapse at 32 weeks gestation, unwitnessed arrest, non-shockable rhythm, no ROSC after 4 minutes of resuscitation.", protocol: "CPR + Manual LUD & Perimortem Cesarean Delivery (PMCD) at 4 mins", drug: "Epinephrine (1:10,000)", dose: "1 mg IV/IO every 3-5 mins" },
+            { title: "Maternal Anaphylaxis (Latex / Latex-Fruit)", BP: "68/32 mmHg", HR: "145 bpm", SpO2: "82%", Temp: "37.0 °C", presentation: "Intraoperative sudden bronchospasm, severe hypotension, and facial angioedema immediately after latex glove exposure.", protocol: "Remove Allergen, High-Flow O2 & Volume Expansion", drug: "Epinephrine (1:1,000)", dose: "0.3 - 0.5 mg IM Outer Thigh" },
+            { title: "Neonatal Supraventricular Tachycardia (SVT)", BP: "40/20 mmHg", HR: "265 bpm", SpO2: "88%", Temp: "36.6 °C", presentation: "2-day-old infant presenting with extreme irritability, poor feeding, p-waves invisible, heart rate narrow-complex 265 bpm.", protocol: "Ice Application to Face (Vagal) or Adenosine Push", drug: "Adenosine", dose: "0.1 mg/kg Rapid IV Push with Double Syringe Flush" },
+            { title: "Neonatal Cold Stress / Severe Hypothermia", BP: "40/22 mmHg", HR: "88 bpm", SpO2: "90%", Temp: "34.0 °C", presentation: "Infant in nursery found cold to touch, pale, lethargic, weak cry, shallow respirations, and blood glucose 32 mg/dL.", protocol: "Slow Gradual Re-warming under Radiant Warmer (0.5°C/hr)", drug: "Warm D10W IV Infusion", dose: "2 mL/kg IV Bolus D10W" },
+            { title: "Maternal Diabetic Ketoacidosis (DKA)", BP: "92/56 mmHg", HR: "130 bpm", SpO2: "96%", Temp: "37.4 °C", presentation: "28-week Type 1 diabetic presenting with Kussmaul breathing, fruity breath, blood glucose 380 mg/dL, pH 7.15, positive serum ketones.", protocol: "Isotonic Saline Resuscitation & Potassium Monitoring", drug: "Regular Insulin", dose: "0.1 units/kg IV Bolus then 0.1 units/kg/hr IV" },
+            { title: "Uterine Tachysystole with Fetal Distress", BP: "115/72 mmHg", HR: "88 bpm", SpO2: "98%", Temp: "36.8 °C", presentation: "Patient on Oxytocin infusion experiencing 7 contractions in 10 minutes with prolonged fetal deceleration down to 70 bpm for 4 mins.", protocol: "Stop Oxytocin Infusion, Oxygen 10L NRB, Left Lateral Position", drug: "Terbutaline Sulfate", dose: "0.25 mg Subcutaneously" }
+        ];
+
+        let nodes = [];
+        let currentNodeId = 0;
+        let score = 0;
+        let clearedCount = 0;
+        let integrity = 100;
+
+        // INITIALIZE APPLICATION
+        document.addEventListener('DOMContentLoaded', () => {
+            initNodes();
+            renderGrid();
+            loadNode(0);
+        });
+
+        function initNodes() {
+            nodes = caseDatabase.map((item, index) => {
+                return {
+                    id: index,
+                    code: `NODE #${String(index + 1).padStart(2, '0')}`,
+                    title: item.title,
+                    status: index === 0 ? 'active' : 'locked',
+                    presentation: item.presentation,
+                    vitals: {
+                        BP: item.BP,
+                        HR: item.HR,
+                        SpO2: item.SpO2,
+                        Temp: item.Temp
+                    },
+                    protocols: [
+                        { id: 'p1', label: item.protocol, correct: true },
+                        { id: 'p2', label: 'Standard Supportive Care & Vitals Observation', correct: false },
+                        { id: 'p3', label: 'Immediate Trendelenburg Position & Fluid Restriction', correct: false }
+                    ].sort(() => Math.random() - 0.5),
+                    medications: [
+                        { id: 'm1', label: item.drug, correct: true },
+                        { id: 'm2', label: 'Diphenhydramine HCl', correct: false },
+                        { id: 'm3', label: 'Dexamethasone Sodium Phosphate', correct: false }
+                    ].sort(() => Math.random() - 0.5),
+                    dosages: [
+                        { id: 'd1', label: item.dose, correct: true },
+                        { id: 'd2', label: '10 mg IV Push Single Dose', correct: false },
+                        { id: 'd3', label: '250 mg IV Infusion over 1 hour', correct: false }
+                    ].sort(() => Math.random() - 0.5)
+                };
+            });
+        }
+
+        // RENDER TACTICAL GRID
+        function renderGrid() {
+            const grid = document.getElementById('nodes-grid');
+            grid.innerHTML = '';
+
+            nodes.forEach((node, index) => {
+                const btn = document.createElement('button');
+                btn.className = `node-btn p-1.5 rounded-lg border text-center font-mono flex flex-col items-center justify-center h-14 ${getNodeStatusClass(node.status)}`;
+                btn.onclick = () => selectNode(index);
+                btn.disabled = node.status === 'locked';
+
+                btn.innerHTML = `
+                    <span class="text-[9px] opacity-75">${String(index + 1).padStart(2, '0')}</span>
+                    <span class="text-[10px] font-bold truncate w-full px-1">${node.status === 'cleared' ? '✓ CLEARED' : node.status === 'failed' ? '✗ FAILED' : node.title.split(' ')[0]}</span>
+                `;
+                grid.appendChild(btn);
+            });
+
+            updateMetrics();
+        }
+
+        function getNodeStatusClass(status) {
+            switch(status) {
+                case 'active': return 'node-active';
+                case 'cleared': return 'node-cleared';
+                case 'failed': return 'node-failed';
+                default: return 'node-locked';
+            }
+        }
+
+        // SELECT AND LOAD NODE
+        function selectNode(index) {
+            if (nodes[index].status === 'locked') return;
+
+            currentNodeId = index;
+            if (nodes[index].status !== 'cleared' && nodes[index].status !== 'failed') {
+                nodes[index].status = 'active';
+            }
+            
+            renderGrid();
+            loadNode(index);
+        }
+
+        // LOAD DATA INTO HUD & DROPDOWNS
+        function loadNode(index) {
+            const node = nodes[index];
+
+            document.getElementById('node-code-display').innerText = node.code;
+            document.getElementById('node-title-display').innerText = node.title;
+            document.getElementById('node-status-badge').innerText = node.status.toUpperCase();
+            document.getElementById('clinical-presentation').innerText = node.presentation;
+
+            // Render Vitals
+            const vitalsGrid = document.getElementById('vitals-grid');
+            vitalsGrid.innerHTML = `
+                <div class="bg-slate-900/80 p-2 rounded border border-slate-800"><span class="text-slate-500">BP:</span> <span class="text-pink-400 font-bold">${node.vitals.BP}</span></div>
+                <div class="bg-slate-900/80 p-2 rounded border border-slate-800"><span class="text-slate-500">HR:</span> <span class="text-pink-400 font-bold">${node.vitals.HR}</span></div>
+                <div class="bg-slate-900/80 p-2 rounded border border-slate-800"><span class="text-slate-500">SpO2:</span> <span class="text-pink-400 font-bold">${node.vitals.SpO2}</span></div>
+                <div class="bg-slate-900/80 p-2 rounded border border-slate-800"><span class="text-slate-500">TEMP:</span> <span class="text-pink-400 font-bold">${node.vitals.Temp}</span></div>
+            `;
+
+            // Populate Dropdowns
+            populateSelect('protocol-select', node.protocols);
+            populateSelect('pharma-select', node.medications);
+            populateSelect('dosage-select', node.dosages);
+
+            // Hide Feedback
+            const feedback = document.getElementById('feedback-message');
+            feedback.classList.add('hidden');
+
+            // Enable/Disable Execute Button
+            const btn = document.getElementById('btn-execute');
+            if (node.status === 'cleared' || node.status === 'failed') {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function populateSelect(elementId, items) {
+            const select = document.getElementById(elementId);
+            select.innerHTML = '<option value="">-- Select Parameter --</option>';
+            items.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.id;
+                opt.textContent = item.label;
+                select.appendChild(opt);
+            });
+        }
+
+        // EXECUTE SEQUENCE EVALUATION
+        function executeSequence() {
+            const pVal = document.getElementById('protocol-select').value;
+            const mVal = document.getElementById('pharma-select').value;
+            const dVal = document.getElementById('dosage-select').value;
+
+            const feedback = document.getElementById('feedback-message');
+
+            if (!pVal || !mVal || !dVal) {
+                feedback.className = 'p-3 rounded-lg mb-3 text-xs font-mono bg-amber-500/10 border border-amber-500/40 text-amber-300';
+                feedback.innerText = 'WARNING: All 3 matrix parameters must be assigned before protocol sequence execution.';
+                feedback.classList.remove('hidden');
+                return;
+            }
+
+            const currentNode = nodes[currentNodeId];
+            const pMatch = currentNode.protocols.find(p => p.id === pVal)?.correct;
+            const mMatch = currentNode.medications.find(m => m.id === mVal)?.correct;
+            const dMatch = currentNode.dosages.find(d => d.id === dVal)?.correct;
+
+            if (pMatch && mMatch && dMatch) {
+                // SUCCESS
+                currentNode.status = 'cleared';
+                score += 100;
+                clearedCount++;
+                
+                // Unlock next node
+                if (currentNodeId + 1 < nodes.length && nodes[currentNodeId + 1].status === 'locked') {
+                    nodes[currentNodeId + 1].status = 'active';
+                }
+
+                feedback.className = 'p-3 rounded-lg mb-3 text-xs font-mono bg-pink-500/10 border border-pink-500/40 text-pink-300';
+                feedback.innerText = `SUCCESS: Protocol sequence verified for ${currentNode.title}. Case stabilized.`;
+            } else {
+                // FAILURE
+                currentNode.status = 'failed';
+                integrity = Math.max(0, integrity - 10);
+
+                feedback.className = 'p-3 rounded-lg mb-3 text-xs font-mono bg-rose-500/10 border border-rose-500/40 text-rose-300';
+                feedback.innerText = `CRITICAL FAILURE: Incorrect clinical management for ${currentNode.title}. Patient compromised.`;
+            }
+
+            feedback.classList.remove('hidden');
+            renderGrid();
+            loadNode(currentNodeId);
+        }
+
+        function updateMetrics() {
+            document.getElementById('metric-progress').innerText = `${clearedCount} / 50`;
+            document.getElementById('metric-score').innerText = score;
+            document.getElementById('metric-integrity').innerText = `${integrity}%`;
+        }
+    </script>
+</body>
+</html>
